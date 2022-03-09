@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <!-- Bootstrap CSS -->
+    <style>
+        @import url("https://fonts.googleapis.com/css?family=Poppins:300,500&display=swap");
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+
+        }
+
+        ::selection {
+            background: none;
+        }
+
+        body {
+            background-color: #3fa9fc;
+        }
+
+        #app {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        button {
+            border-color: #3fa9fc;
+            font-size: 20px;
+        }
+
+        .calculator {
+            display: grid;
+            grid-template-rows: repeat(3, minmax(60px, auto));
+            grid-template-columns: repeat(4, 60px);
+            grid-gap: 12px;
+            padding: 35px;
+            font-family: "Poppins";
+            font-weight: 300;
+            font-size: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 3px 80px -30px rgba(13, 81, 134, 1);
+        }
+
+        .calculator .calculator_keys {
+            display: grid;
+            grid-template-rows: repeat(4, minmax(60px, auto));
+            grid-template-columns: repeat(4, 60px);
+            grid-gap: 12px;
+            font-family: "Poppins";
+            font-weight: 300;
+            font-size: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+        }
+
+        .btn,
+        .zero {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #484848;
+            background-color: #f4faff;
+            border-radius: 5px;
+        }
+
+        .display,
+        .answer {
+            grid-column: 1 / 5;
+            display: flex;
+            align-items: center;
+        }
+
+        .display {
+            color: #a3a3a3;
+            border-bottom: 1px solid #e1e1e1;
+            margin-bottom: 15px;
+            overflow: hidden;
+            text-overflow: clip;
+        }
+
+        .answer {
+            font-weight: 500;
+            color: #146080;
+            font-size: 55px;
+            height: 65px;
+        }
+
+        .zero {
+            grid-column: 1 / 3;
+        }
+
+        .operator {
+            background-color: #d9efff;
+            color: #3fa9fc;
+        }
+    </style>
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> -->
+</head>
+
+<body>
+    <div id="app">
+        <div class="container">
+            <div class="calculator">
+                <div class="answer"></div>
+                <div class="display"></div>
+                <div class="calculator_keys">
+                    <button class="btn operator op-diiv" data-action="divide"> / </button>
+                    <button class="btn operator op-add" data-action="plus">+</button>
+                    <button class="btn operator op-mul" data-action="times">*</button>
+                    <button class="btn operator op-sub" data-action="minus">-</button>
+                    <button id="n1" class="btn digit-1">1</button>
+                    <button id="n2" class="btn digit-2">2</button>
+                    <button id="n3" class="btn digit-3">3</button>
+                    <button id="n4" class="btn digit-4">4</button>
+                    <button id="n5" class="btn digit-5">5</button>
+                    <button id="n6" class="btn digit-6">6</button>
+                    <button id="n7" class="btn digit-7">7</button>
+                    <button id="n8" class="btn digit-8">8</button>
+                    <button id="n9" class="btn digit-9">9</button>
+                    <button id="n0" class="btn digit-0">0</button>
+                    <button class="btn operator clear" data-action="clear">C</button>
+                    <button class="btn operator eq" data-action="solve">=</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+        integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script>
+        const calculate = (n1, operator, n2) => {
+            const firstNum = parseFloat(n1)
+            const secondNum = parseFloat(n2)
+            if (operator === 'plus') {
+                return Math.floor(firstNum + secondNum)
+            } else if (operator === 'minus') {
+                return Math.floor(firstNum - secondNum)
+            } else if (operator === 'times') {
+                return Math.floor(firstNum * secondNum)
+            } else if (operator === 'divide') {
+                if(secondNum === 0) return clear();
+                return Math.floor(firstNum / secondNum)
+            }
+        }
+
+        const getKeyType = key => {
+            const { action } = key.dataset
+            if (!action) {
+                return 'number'
+            } else if (
+                action === 'plus' ||
+                action === 'minus' ||
+                action === 'times' ||
+                action === 'divide'
+            ) {
+                return 'operator'
+            }
+            else {
+                return action
+            }
+        }
+
+        const getOperatorType = key => {
+            const { action } = key.dataset
+            return action
+        }
+
+        const getResult = (key, displayedNum, state) => {
+            const keyContent = key.textContent
+            const keyType = getKeyType(key)
+            const { firstValue, operator, modValue, previousKeyType } = state
+
+            if (keyType === 'number') {
+                return displayedNum === '0' ||
+                    previousKeyType === 'operator' ||
+                    previousKeyType === 'solve'
+                    ? keyContent
+                    : displayedNum + keyContent
+            }
+
+            if (keyType === 'operator') {
+                return firstValue &&
+                    operator &&
+                    previousKeyType !== 'operator' &&
+                    previousKeyType !== 'solve'
+                    ? calculate(firstValue, operator, displayedNum)
+                    : displayedNum
+            }
+
+            if (keyType === 'clear') return 0
+
+            if (keyType === 'solve') {
+                return firstValue
+                    ? previousKeyType === 'solve'
+                        ? calculate(displayedNum, operator, modValue)
+                        : calculate(firstValue, operator, displayedNum)
+                    : displayedNum
+            }
+        }
+
+        const updateCalculatorState = (key, calculator, calculatedValue, displayedNum) => {
+            const keyType = getKeyType(key)
+            const {
+                firstValue,
+                operator,
+                modValue,
+                previousKeyType
+            } = calculator.dataset
+
+            calculator.dataset.previousKeyType = keyType
+
+            if (keyType === 'operator') {
+                calculator.dataset.operator = key.dataset.action
+                calculator.dataset.firstValue = firstValue &&
+                    operator &&
+                    previousKeyType !== 'operator' &&
+                    previousKeyType !== 'solve'
+                    ? calculatedValue
+                    : displayedNum
+            }
+
+            if (keyType === 'calculate') {
+                calculator.dataset.modValue = firstValue && previousKeyType === 'solve'
+                    ? modValue
+                    : displayedNum
+            }
+
+            if (keyType === 'clear' && key.textContent === 'C') {
+                clear();
+            }
+        }
+
+        const clear = () => {
+          calculator.dataset.firstValue = ''
+          calculator.dataset.modValue = ''
+          calculator.dataset.operator = ''
+          calculator.dataset.previousKeyType = ''
+        }
+
+        const updateVisualState = (key, calculator) => {
+            const keyType = getKeyType(key)
+            Array.from(key.parentNode.children).forEach(k => k.classList.remove('is-depressed'))
+
+            if (keyType === 'operator') key.classList.add('is-depressed')
+            if (keyType === 'clear' && key.textContent !== 'C') key.textContent = 'C'
+            if (keyType !== 'clear') {
+                const clearButton = calculator.querySelector('[data-action=clear]')
+                clearButton.textContent = 'C'
+            }
+        }
+
+        const calculator = document.querySelector('.calculator')
+        const display = calculator.querySelector('.answer')
+        const keys = calculator.querySelector('.calculator_keys')
+        console.log(display)
+
+        keys.addEventListener('click', e => {
+            if (!e.target.matches('button')) return
+            const key = e.target
+            const displayedNum = display.textContent
+            const resultString = getResult(key, displayedNum, calculator.dataset)
+
+            console.log(getKeyType(e.target));
+
+            if(getKeyType(e.target) == "operator"){
+              let operatorType = getOperatorType(e.target);
+              if(display.innerText == "" && operatorType !== "minus") return
+              display.innerText = resultString + e.target.textContent
+            }
+            else display.textContent = resultString
+            // console.log(resultString + e.target.textContent);
+            // display.textContent = resultString
+            updateCalculatorState(key, calculator, resultString, displayedNum)
+            updateVisualState(key, calculator)
+        })
+
+    </script>
+
+
+</body>
+
+</html>
